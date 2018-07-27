@@ -111,7 +111,6 @@
         "no-this-assignment": true,
         "no-typeof-undefined": true,
         "no-unnecessary-bind": true,
-        "no-unnecessary-class": true,
         "no-unnecessary-field-initialization": true,
         "no-unnecessary-local-variable": true,
         "no-unnecessary-override": true,
