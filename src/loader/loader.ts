@@ -2,22 +2,6 @@ import * as path from 'path';
 import { loader } from 'webpack';
 import { OptionObject, getOptions, stringifyRequest } from 'loader-utils';
 
-// const validationMap = {
-//     type: 'object',
-//     properties: {
-//         hmr: {
-//             type: 'boolean',
-//         },
-//         sourceMap: {
-//             type: 'boolean',
-//         },
-//         convertToAbsoluteUrls: {
-//             type: 'boolean',
-//         },
-//     },
-//     additionalProperties: false,
-// };
-
 export = class IsomorphicStylesLoader {
     public static pitch(this: loader.LoaderContext, request: string): string {
         if (this.cacheable) {
@@ -29,9 +13,9 @@ export = class IsomorphicStylesLoader {
         // TODO: Add validation schema
         // validateOptions(require('./options.json'), options, 'Style Loader')
 
-        console.log('');
-        console.log('');
-        console.log(options);
+        // console.log('');
+        // console.log('');
+        // console.log(options);
 
         const { autoInject, autoCollect } = options;
         const collectStylesPath = path.join(__dirname, './collect-styles.js');
@@ -40,26 +24,42 @@ export = class IsomorphicStylesLoader {
         const injectStylesRequest = stringifyRequest(this, `!${injectStylesPath}`);
         const stylesRequest = stringifyRequest(this, `!!${request}`);
 
-        console.log('');
-        console.log('');
+        // console.log('');
+        // console.log('');
 
         return `
-            var collectStyles = require(${collectStylesRequest}).collectStyles;
-            var injectStyles = require(${injectStylesRequest}).injectStyles;
-            var styles = require(${stylesRequest});
+            const collectStyles = require(${collectStylesRequest}).collectStyles;
+            const injectStyles = require(${injectStylesRequest}).injectStyles;
+            const styles = require(${stylesRequest});
 
             if (typeof styles === 'string') {
                 styles = [[module.id, styles, '']];
             }
 
-            module.exports = styles.locals || {};
-            module.exports._getStyles = function() { return styles; };
-            module.exports._getCss = function() { return styles.toString(); };
-            module.exports._injectStyles = function() {
-                collectStyles(styles);
-                return injectStyles(styles)
+            const utils = {
+                _getStyles: _ => styles,
+                _getCss: _ => styles.toString(),
+                _injectStyles: _ => injectStyles(styles),
             };
+            const locals = Object.assign({}, styles.locals || {}, utils)
 
+            const localsProxy = new Proxy({}, {
+                get(_target, prop, _receiver) {
+                    if (Object.keys(utils).indexOf(prop) === -1 && prop !== '__esModule') {
+                        console.log('get class name', prop, 'in', module.id)
+                        collectStyles(styles, module.id);
+                    }
+
+                    if (locals[prop]) {
+                        return locals[prop];
+                    }
+                }
+            });
+
+            module.exports = localsProxy;
+
+            // TODO: Investigate this case
+            /*
             if (${autoInject}) {
                 if (${autoCollect}) {
                     collectStyles(styles);
@@ -67,6 +67,7 @@ export = class IsomorphicStylesLoader {
 
                 injectStyles(styles);
             }
+            */
 
             ${getHMR(this, request)}
         `;
@@ -74,7 +75,11 @@ export = class IsomorphicStylesLoader {
 };
 
 function getLoaderOptions(ctx: loader.LoaderContext): OptionObject {
-    const options = getOptions(ctx);
+    let options = getOptions(ctx);
+    if (options === null) {
+        options = {};
+    }
+
     options.hmr = options.hmr === undefined ? true : options.hmr;
     options.autoInject = options.autoInject === undefined ? true : Boolean(options.autoInject);
     options.autoCollect = options.autoCollect === undefined ? true : Boolean(options.autoCollect);

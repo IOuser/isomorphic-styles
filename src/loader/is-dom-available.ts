@@ -1,3 +1,7 @@
 export function isDOMAvailable(): boolean {
-    return window !== undefined && window.document !== undefined && window.document.createElement !== undefined;
+    return (
+        typeof window !== 'undefined' &&
+        typeof window.document !== 'undefined' &&
+        typeof window.document.createElement !== 'undefined'
+    );
 }
