@@ -46,7 +46,7 @@ export = class IsomorphicStylesLoader {
             const localsProxy = new Proxy({}, {
                 get(_target, prop, _receiver) {
                     if (Object.keys(utils).indexOf(prop) === -1 && prop !== '__esModule') {
-                        console.log('get class name', prop, 'in', module.id)
+                        // console.log('get class name', prop, 'in', module.id)
                         collectStyles(styles, module.id);
                     }
 
