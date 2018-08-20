@@ -1,6 +1,6 @@
 {
     "name": "isomorphic-styles",
-    "version": "0.0.1-beta.9",
+    "version": "0.0.1-beta.10",
     "description": "Strongly-typed isomorphic styles for React",
     "repository": "https://github.com/IOuser/isomorphic-styles",
     "author": "Ihor Yemets <i.yemets@p1k.co.uk>",
@@ -54,12 +54,6 @@
     "dependencies": {
         "isomorphic-style-loader": "4.0.0",
         "loader-utils": "^1.1.0"
-    },
-    "resolutions": {
-        "@types/loader-utils": "^1.1.3",
-        "@types/react": "^16.4.7",
-        "@types/react-dom": "^16.0.6",
-        "@types/webpack": "^4.4.8"
     },
     "lint-staged": {
         "*.{ts}": [
