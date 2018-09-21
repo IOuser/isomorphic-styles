@@ -1,0 +1,14 @@
+.test {
+    background: red;
+    height: 50px;
+    width: 500px;
+}
+@media (min-widht: 768px) {
+    .test {
+        background: blue;
+    }
+}
+
+:global .kek {
+    display: inline;
+}

@@ -1,0 +1,8 @@
+.test2 {
+    display: none;
+}
+@media (min-widht: 768px) {
+    .test2 {
+        display: block;
+    }
+}
